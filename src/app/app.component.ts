@@ -1,5 +1,9 @@
+import { Observable } from 'rxjs/Rx';
 import { Component } from '@angular/core';
 import { Http } from '@angular/http';
+import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
+import { AngularFireAuth } from 'angularfire2/auth';
+import * as firebase from 'firebase/app';
 
 @Component({
   selector: 'app-root',
@@ -7,13 +11,37 @@ import { Http } from '@angular/http';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  
- myData: Array<any>;
 
-  constructor(private http:Http) {
-    
-    this.http.get('https://jsonplaceholder.typicode.com/photos')
-      .map(response => response.json())
-      .subscribe(res => this.myData = res);
+
+  user: Observable<firebase.User>;
+  items: FirebaseListObservable<any[]>;
+  msgVal: string = '';
+
+
+
+  constructor(public afAuth: AngularFireAuth, public af: AngularFireDatabase) {
+    this.items = af.list('/messages', {
+      query: {
+        limitToLast: 50
+      }
+    });
+
+    this.user = this.afAuth.authState;
+
   }
+
+
+  login() {
+    this.afAuth.auth.signInAnonymously();
+  }
+
+  logout() {
+    this.afAuth.auth.signOut();
+  }
+
+  Send(desc: string) {
+    this.items.push({ message: desc });
+    this.msgVal = '';
+  }
+
 }
