@@ -13,16 +13,23 @@
 
 
 
-<md-card class="example-card" *ngFor="let data of (myData ? myData.slice(0,10): []); let i = index">
+<md-card class="example-card">
+  
 
-  <img md-card-image src="{{ data.url }}">
-  <md-card-header>
-    <md-card-title>{{ data.title }}</md-card-title>
-  </md-card-header>
 
   <md-card-actions>
-    <button md-button>LIKE</button>
-    <button md-button>SHARE</button>
+    <button md-button (click)="login()" *ngIf="!(user | async)?.uid">Anonymous Login</button>
+  <button md-button  (click)="logout()" *ngIf="(user | async)?.uid">Logout</button>
   </md-card-actions>
+
   
 </md-card>
+
+
+
+<input type="text" id="message" *ngIf="(user | async)?.uid" placeholder="What is it that you do?" (keyup.enter)="Send($event.target.value)" [(ngModel)]="msgVal" />
+ 
+  <md-card class="example-card" id="details-container">
+      <p *ngFor="let item of items | async"><img style="width:32px;Height:32px;" src="../assets/images/pin.svg">{{item.message}}</p>
+  </md-card>
+
